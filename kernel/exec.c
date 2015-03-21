@@ -48,8 +48,9 @@ exec(char *path, char **argv)
   iunlockput(ip);
   ip = 0;
 
-  // Allocate a one-page stack at the next page boundary
-  sz = PGROUNDUP(sz);
+  // Allocate a one-page stack one page away from USERTOP (at bottom
+  // grow upwards)
+  sz = (USERTOP - PGSIZE);
   if((sz = allocuvm(pgdir, sz, sz + PGSIZE)) == 0)
     goto bad;
 
