@@ -11,7 +11,7 @@ exec(char *path, char **argv)
 {
   char *s, *last;
   int i, off;
-  uint argc, sz, sp, ustack[3+MAXARG+1];
+  uint argc, sz,s_sz, sp, ustack[3+MAXARG+1];
   struct elfhdr elf;
   struct inode *ip;
   struct proghdr ph;
@@ -50,12 +50,12 @@ exec(char *path, char **argv)
 
   // Allocate a one-page stack one page away from USERTOP (at bottom
   // grow upwards)
-  sz = (USERTOP - PGSIZE);
-  if((sz = allocuvm(pgdir, sz, sz + PGSIZE)) == 0)
+  s_sz = (USERTOP - PGSIZE);
+  if((s_sz = allocuvm(pgdir, s_sz, s_sz + PGSIZE)) == 0)
     goto bad;
 
   // Push argument strings, prepare rest of stack in ustack.
-  sp = sz;
+  sp = s_sz;
   for(argc = 0; argv[argc]; argc++) {
     if(argc >= MAXARG)
       goto bad;
@@ -85,6 +85,7 @@ exec(char *path, char **argv)
   oldpgdir = proc->pgdir;
   proc->pgdir = pgdir;
   proc->sz = sz;
+  proc->s_sz =s_sz;
   proc->tf->eip = elf.entry;  // main
   proc->tf->esp = sp;
   switchuvm(proc);
