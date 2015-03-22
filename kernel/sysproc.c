@@ -49,6 +49,9 @@ sys_sbrk(void)
 
   if(argint(0, &n) < 0)
     return -1;
+  //check if page above the stack
+  if( USERTOP - proc->s_sz - 4096 >= proc->sz + n )
+    return -1;
   addr = proc->sz;
   if(growproc(n) < 0)
     return -1;
