@@ -34,6 +34,23 @@ idtinit(void)
 void
 trap(struct trapframe *tf)
 {
+
+  if(tf->trapno == T_PGFLT)
+  {
+    cprintf("PGFAULT HANDLED\n");
+    uint addr = rcr2();
+    cprintf("%d\n",addr);
+    if( proc->s_sz - PGSIZE < addr && addr > proc->sz + PGSIZE )
+    {
+      proc->s_sz += PGSIZE;
+      return;
+    }
+    else
+    {
+      cprintf("Fault at %x\n", rcr2() );
+    }
+  }
+
   if(tf->trapno == T_SYSCALL){
     if(proc->killed)
       exit();
