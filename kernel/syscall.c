@@ -18,10 +18,16 @@ int
 fetchint(struct proc *p, uint addr, int *ip)
 {
   //cprintf("fetchint\n");
-  if(p->pid != 1 && ( addr < PGSIZE || (addr >= p->sz && addr < p->s_sz) || addr > USERTOP))
+  if(p->pid != 1 && ( addr < PGSIZE || (addr >= p->sz && addr <= p->s_sz) || addr >= USERTOP))
+  {
+    cprintf("A\n");
     return -1;
-  if( (addr+4 > p->sz || addr+4 > USERTOP))
+  }
+  if( ((addr+4 > p->sz && addr <= p->s_sz) || addr+4 >= USERTOP))
+  {
+    cprintf("B\n");
     return -1;
+  }
   *ip = *(int*)(addr);
   return 0;
 }
@@ -35,7 +41,7 @@ fetchstr(struct proc *p, uint addr, char **pp)
   char *s, *ep;
  // cprintf("fetchstr\n");
 
-  if( p->pid != 1 && (addr < PGSIZE || (addr >= p->sz && addr < p->s_sz) || addr > USERTOP ))
+  if( p->pid != 1 && (addr < PGSIZE || (addr >= p->sz && addr <= p->s_sz) || addr >= USERTOP ))
     return -1;
   *pp = (char*)addr;
   if( addr <= p->sz)
@@ -46,6 +52,8 @@ fetchstr(struct proc *p, uint addr, char **pp)
   for(s = *pp; s < ep; s++)
     if(*s == 0)
       return s - *pp;
+
+  cprintf("C\n");
   return -1;
 }
 
@@ -72,7 +80,7 @@ argptr(int n, char **pp, int size)
     cprintf("BREAK!i\n");
     return -1;
   }
-  if( (uint)i+size < PGSIZE || ((uint)i+size > proc->sz && (uint)i+size < USERTOP ))
+  if( (uint)i+size < PGSIZE || ((uint)i+size > proc->sz && (uint)i < proc->s_sz ) || (uint)i+size > USERTOP )
   {
     cprintf("break2\n");
     return -1;

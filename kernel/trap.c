@@ -37,12 +37,14 @@ trap(struct trapframe *tf)
 
   if(tf->trapno == T_PGFLT)
   {
-    cprintf("PGFAULT HANDLED\n");
+    //cprintf("PGFAULT HANDLED\n");
     uint addr = rcr2();
     cprintf("%d\n",addr);
-    if( proc->s_sz - PGSIZE < addr && addr > proc->sz + PGSIZE )
+    if( proc->s_sz - PGSIZE <= addr && proc->sz > proc->s_sz-PGSIZE )
     {
-      proc->s_sz += PGSIZE;
+      if( 0 != allocuvm(proc->pgdir ,proc->s_sz - PGSIZE, proc->s_sz) )
+        panic("BAD ALLOCUVM IN STACK GROW");
+      proc->s_sz -= PGSIZE;
       return;
     }
     else
