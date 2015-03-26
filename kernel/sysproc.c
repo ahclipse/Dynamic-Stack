@@ -49,9 +49,13 @@ sys_sbrk(void)
 
   if(argint(0, &n) < 0)
     return -1;
-  //check if page above the stack
-  if( n > 0 && (proc->s_sz  < proc->sz + PGSIZE))
+  //check if there is a page above the stack
+  cprintf("SBRK\ts_sz:%d\tsz:%d\t2pgsize+sz:%d\n",proc->s_sz,proc->sz,proc->sz +n + PGSIZE);
+  if( proc->s_sz < proc->sz + n + PGSIZE)
+  {
+    cprintf("NUP\ts_sz:%d\tsz:%d\t2pgsize+sz:%d\n",proc->s_sz,proc->sz,proc->sz + 2*PGSIZE);
     return -1;
+  }
   addr = proc->sz;
   if(growproc(n) < 0)
     return -1;
