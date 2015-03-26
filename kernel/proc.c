@@ -161,6 +161,7 @@ fork(void)
 }
 
 // Exit the current process.  Does not return.
+// Exit the current process.  Does not return.
 // An exited process remains in the zombie state
 // until its parent calls wait() to find out it exited.
 void
@@ -315,7 +316,6 @@ yield(void)
   sched();
   release(&ptable.lock);
 }
-
 // A fork child's very first scheduling by scheduler()
 // will swtch here.  "Return" to user space.
 void

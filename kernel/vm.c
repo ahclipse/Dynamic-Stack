@@ -308,7 +308,7 @@ copyuvm(pde_t *pgdir, uint sz, uint s_sz)
     return 0;
   
   //copy code and hep
-  for(i = 4096; i < sz; i += PGSIZE){
+  for(i = PGSIZE; i < sz; i += PGSIZE){
     if((pte = walkpgdir(pgdir, (void*)i, 0)) == 0)
       panic("copyuvm: pte should exist");
     if(!(*pte & PTE_P))
